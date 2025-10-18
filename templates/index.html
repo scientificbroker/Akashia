@@ -7,13 +7,26 @@
   </head>
   <body>
     <h1>Banco de Sueños — Envío</h1>
-    <form method="post">
-      <label>Nombre:<br><input type="text" name="name" required></label><br>
-      <label>Correo:<br><input type="email" name="email" required></label><br>
-      <label>Región:<br><input type="text" name="region"></label><br>
-      <label>Dream message:<br><textarea name="message" rows="5"></textarea></label><br>
+    {% if error %}
+      <div style="color: red">{{ error }}</div>
+    {% endif %}
+    <form method="post" id="dreamForm">
+      <label>Nombre:<br><input type="text" name="name" id="name" required maxlength="200"></label><br>
+      <label>Correo:<br><input type="email" name="email" id="email" required></label><br>
+      <label>Región:<br><input type="text" name="region" id="region"></label><br>
+      <label>Dream message:<br><textarea name="message" id="message" rows="5" maxlength="5000"></textarea></label><br>
       <button type="submit">Enviar</button>
     </form>
+    <script>
+      document.getElementById('dreamForm').addEventListener('submit', function(e){
+        var name = document.getElementById('name').value.trim();
+        var email = document.getElementById('email').value.trim();
+        if(!name || !email){
+          e.preventDefault();
+          alert('Nombre y correo son obligatorios');
+        }
+      });
+    </script>
     <hr>
     <a href="/submissions">Ver envíos</a>
   </body>
