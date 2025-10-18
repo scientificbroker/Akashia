@@ -14,7 +14,8 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          # allow using a PAT with write:packages if provided
+          password: ${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v4
@@ -26,4 +27,5 @@ jobs:
       - name: Trigger Render deploy (optional)
         if: ${{ secrets.RENDER_WEBHOOK != '' }}
         run: |
+          echo "Triggering Render via webhook..."
           curl -X POST -H "Content-Type: application/json" -d '{}' ${{ secrets.RENDER_WEBHOOK }}
