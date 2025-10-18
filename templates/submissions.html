@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Envíos</title>
+  </head>
+  <body>
+    <h1>Envíos</h1>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Nombre</th>
+          <th>Correo</th>
+          <th>Región</th>
+          <th>Mensaje</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td>{{ r.timestamp }}</td>
+          <td>{{ r.name }}</td>
+          <td>{{ r.email }}</td>
+          <td>{{ r.region }}</td>
+          <td>{{ r.message }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <a href="/">Volver</a>
+  </body>
+</html>
