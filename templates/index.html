@@ -3,31 +3,220 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Akashia - Formulario</title>
+    <title>Akashia - Banco de Sueños</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      }
+      h1 {
+        color: #4a5568;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2d3748;
+      }
+      input, textarea, select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+        box-sizing: border-box;
+      }
+      input:focus, textarea:focus, select:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+      textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+      .submit-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        transition: transform 0.2s;
+      }
+      .submit-btn:hover {
+        transform: translateY(-2px);
+      }
+      .error {
+        background: #fed7d7;
+        color: #c53030;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border-left: 4px solid #c53030;
+      }
+      .dream-counter {
+        text-align: right;
+        color: #718096;
+        font-size: 14px;
+        margin-top: 5px;
+      }
+      .nav-links {
+        text-align: center;
+        margin-top: 30px;
+      }
+      .nav-links a {
+        color: #667eea;
+        text-decoration: none;
+        margin: 0 15px;
+        font-weight: 500;
+      }
+      .nav-links a:hover {
+        text-decoration: underline;
+      }
+    </style>
   </head>
   <body>
-    <h1>Banco de Sueños — Envío</h1>
-    {% if error %}
-      <div style="color: red">{{ error }}</div>
-    {% endif %}
-    <form method="post" id="dreamForm">
-      <label>Nombre:<br><input type="text" name="name" id="name" required maxlength="200"></label><br>
-      <label>Correo:<br><input type="email" name="email" id="email" required></label><br>
-      <label>Región:<br><input type="text" name="region" id="region"></label><br>
-      <label>Dream message:<br><textarea name="message" id="message" rows="5" maxlength="5000"></textarea></label><br>
-      <button type="submit">Enviar</button>
-    </form>
+    <div class="container">
+      <h1>🌙 Banco de Sueños</h1>
+      <p style="text-align: center; color: #718096; margin-bottom: 30px;">
+        Comparte tu sueño y descubre patrones semánticos únicos
+      </p>
+      
+      {% if error %}
+        <div class="error">{{ error }}</div>
+      {% endif %}
+      
+      <form method="post" id="dreamForm">
+        <div class="form-group">
+          <label for="name">Nombre completo:</label>
+          <input type="text" name="name" id="name" required maxlength="200" 
+                 placeholder="Tu nombre completo">
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Correo electrónico:</label>
+          <input type="email" name="email" id="email" required 
+                 placeholder="tu@email.com">
+        </div>
+        
+        <div class="form-group">
+          <label for="age">Edad:</label>
+          <input type="number" name="age" id="age" min="13" max="120" 
+                 placeholder="Tu edad">
+        </div>
+        
+        <div class="form-group">
+          <label for="region">Región/País:</label>
+          <input type="text" name="region" id="region" 
+                 placeholder="Ej: Madrid, España">
+        </div>
+        
+        <div class="form-group">
+          <label for="dream_type">Tipo de sueño:</label>
+          <select name="dream_type" id="dream_type">
+            <option value="">Selecciona el tipo de sueño</option>
+            <option value="normal">Sueño normal</option>
+            <option value="lucido">Sueño lúcido</option>
+            <option value="pesadilla">Pesadilla</option>
+            <option value="recurrente">Sueño recurrente</option>
+            <option value="profetico">Sueño profético/premonitorio</option>
+            <option value="vivido">Sueño muy vívido</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="emotion">Emoción principal:</label>
+          <select name="emotion" id="emotion">
+            <option value="">¿Cómo te sentiste?</option>
+            <option value="alegria">Alegría</option>
+            <option value="miedo">Miedo</option>
+            <option value="tristeza">Tristeza</option>
+            <option value="ira">Ira</option>
+            <option value="sorpresa">Sorpresa</option>
+            <option value="paz">Paz/Tranquilidad</option>
+            <option value="confusion">Confusión</option>
+            <option value="nostalgia">Nostalgia</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="message">Describe tu sueño:</label>
+          <textarea name="message" id="message" rows="8" maxlength="5000" 
+                    placeholder="Describe tu sueño con el mayor detalle posible. Incluye lugares, personas, objetos, acciones y emociones que recuerdes..."></textarea>
+          <div class="dream-counter">
+            <span id="charCount">0</span>/5000 caracteres
+          </div>
+        </div>
+        
+        <button type="submit" class="submit-btn">🌙 Registrar Sueño</button>
+      </form>
+      
+      <div class="nav-links">
+        <a href="/analysis">📊 Ver Análisis</a>
+        <a href="/submissions">📝 Ver Sueños</a>
+        <a href="/dashboard">📈 Dashboard</a>
+      </div>
+    </div>
+
     <script>
-      document.getElementById('dreamForm').addEventListener('submit', function(e){
-        var name = document.getElementById('name').value.trim();
-        var email = document.getElementById('email').value.trim();
-        if(!name || !email){
-          e.preventDefault();
-          alert('Nombre y correo son obligatorios');
+      // Contador de caracteres
+      const messageTextarea = document.getElementById('message');
+      const charCount = document.getElementById('charCount');
+      
+      messageTextarea.addEventListener('input', function() {
+        charCount.textContent = this.value.length;
+        if (this.value.length > 4500) {
+          charCount.style.color = '#c53030';
+        } else if (this.value.length > 4000) {
+          charCount.style.color = '#d69e2e';
+        } else {
+          charCount.style.color = '#718096';
         }
       });
+
+      // Validación del formulario
+      document.getElementById('dreamForm').addEventListener('submit', function(e){
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const message = document.getElementById('message').value.trim();
+        
+        if(!name || !email) {
+          e.preventDefault();
+          alert('Nombre y correo son obligatorios');
+          return;
+        }
+        
+        if(message.length < 50) {
+          e.preventDefault();
+          alert('Por favor, describe tu sueño con al menos 50 caracteres para un mejor análisis');
+          return;
+        }
+        
+        // Mostrar mensaje de procesamiento
+        const submitBtn = document.querySelector('.submit-btn');
+        submitBtn.textContent = '🌙 Procesando sueño...';
+        submitBtn.disabled = true;
+      });
     </script>
-    <hr>
-    <a href="/submissions">Ver envíos</a>
   </body>
 </html>

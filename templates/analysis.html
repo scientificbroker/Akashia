@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Akashia - Análisis Semántico</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .stat-card h3 {
+            margin: 0 0 10px 0;
+            color: #2d3748;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .chart-container {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .dream-list {
+            margin-top: 30px;
+        }
+        .dream-item {
+            background: #f7fafc;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .dream-meta {
+            font-size: 0.9em;
+            color: #718096;
+            margin-bottom: 10px;
+        }
+        .dream-text {
+            color: #2d3748;
+            line-height: 1.6;
+        }
+        .nav-links {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+        .pattern-tag {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Análisis Semántico de Sueños</h1>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total de Sueños</h3>
+                <div class="stat-number">{{ stats.total_dreams }}</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Intensidad Promedio</h3>
+                <div class="stat-number">{{ stats.avg_intensity }}/100</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Sueños Positivos</h3>
+                <div class="stat-number">{{ stats.sentiment_distribution.positivo }}</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Sueños Negativos</h3>
+                <div class="stat-number">{{ stats.sentiment_distribution.negativo }}</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Distribución de Sentimientos</h3>
+            <div style="display: flex; gap: 20px; align-items: center;">
+                <div style="flex: 1;">
+                    <div style="background: #48bb78; height: 20px; width: {{ (stats.sentiment_distribution.positivo / stats.total_dreams * 100) if stats.total_dreams > 0 else 0 }}%; border-radius: 10px;"></div>
+                    <small>Positivos: {{ stats.sentiment_distribution.positivo }}</small>
+                </div>
+                <div style="flex: 1;">
+                    <div style="background: #f56565; height: 20px; width: {{ (stats.sentiment_distribution.negativo / stats.total_dreams * 100) if stats.total_dreams > 0 else 0 }}%; border-radius: 10px;"></div>
+                    <small>Negativos: {{ stats.sentiment_distribution.negativo }}</small>
+                </div>
+                <div style="flex: 1;">
+                    <div style="background: #a0aec0; height: 20px; width: {{ (stats.sentiment_distribution.neutral / stats.total_dreams * 100) if stats.total_dreams > 0 else 0 }}%; border-radius: 10px;"></div>
+                    <small>Neutrales: {{ stats.sentiment_distribution.neutral }}</small>
+                </div>
+            </div>
+        </div>
+
+        {% if stats.common_patterns %}
+        <div class="chart-container">
+            <h3>Patrones Más Comunes</h3>
+            {% for pattern, count in stats.common_patterns.items() %}
+                <span class="pattern-tag">{{ pattern }} ({{ count }})</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if stats.dream_types %}
+        <div class="chart-container">
+            <h3>Tipos de Sueños</h3>
+            {% for dream_type, count in stats.dream_types.items() %}
+                {% if dream_type %}
+                <div style="margin: 5px 0;">
+                    <strong>{{ dream_type }}:</strong> {{ count }} sueños
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="dream-list">
+            <h3>Últimos Sueños Registrados</h3>
+            {% for dream in dreams %}
+            <div class="dream-item">
+                <div class="dream-meta">
+                    <strong>{{ dream.name }}</strong> - {{ dream.region }} - {{ dream.dream_type }} - {{ dream.emotion }}
+                </div>
+                <div class="dream-text">
+                    {{ dream.message[:200] }}{% if dream.message|length > 200 %}...{% endif %}
+                </div>
+                <div style="margin-top: 10px;">
+                    <a href="/dream-analysis/{{ loop.index0 }}" style="color: #667eea; text-decoration: none;">
+                        Ver análisis completo →
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="nav-links">
+            <a href="/">🌙 Registrar Sueño</a>
+            <a href="/submissions">📝 Ver Todos los Sueños</a>
+            <a href="/dashboard">📈 Dashboard Avanzado</a>
+        </div>
+    </div>
+</body>
+</html>

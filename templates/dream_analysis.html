@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Akashia - Análisis del Sueño</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .dream-header {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+        .dream-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .meta-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #2d3748;
+        }
+        .meta-value {
+            color: #718096;
+        }
+        .dream-text {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            line-height: 1.6;
+            color: #2d3748;
+            border: 1px solid #e2e8f0;
+        }
+        .analysis-section {
+            margin: 30px 0;
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .analysis-section h3 {
+            color: #2d3748;
+            margin-top: 0;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .sentiment-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .sentiment-label {
+            min-width: 100px;
+            font-weight: bold;
+        }
+        .sentiment-score {
+            flex: 1;
+            height: 20px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            position: relative;
+        }
+        .sentiment-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        .sentiment-positive { background: #48bb78; }
+        .sentiment-negative { background: #f56565; }
+        .sentiment-neutral { background: #a0aec0; }
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .pattern-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .pattern-found {
+            background: #667eea;
+            color: white;
+        }
+        .keyword-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 15px 0;
+        }
+        .keyword {
+            background: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+        .intensity-meter {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .intensity-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: white;
+        }
+        .intensity-low { background: #48bb78; }
+        .intensity-moderate { background: #ed8936; }
+        .intensity-high { background: #f56565; }
+        .intensity-very-high { background: #9f7aea; }
+        .nav-links {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Análisis Detallado del Sueño</h1>
+        
+        <div class="dream-header">
+            <div class="dream-meta">
+                <div class="meta-item">
+                    <div class="meta-label">Soñante:</div>
+                    <div class="meta-value">{{ dream.name }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Región:</div>
+                    <div class="meta-value">{{ dream.region or 'No especificado' }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Tipo de Sueño:</div>
+                    <div class="meta-value">{{ dream.dream_type or 'No especificado' }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Emoción Principal:</div>
+                    <div class="meta-value">{{ dream.emotion or 'No especificado' }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Fecha:</div>
+                    <div class="meta-value">{{ dream.timestamp[:10] }}</div>
+                </div>
+            </div>
+            
+            <div class="dream-text">
+                <h4>Descripción del Sueño:</h4>
+                {{ dream.message }}
+            </div>
+        </div>
+
+        {% if analysis and not analysis.error %}
+        <!-- Análisis de Sentimientos -->
+        <div class="analysis-section">
+            <h3>📊 Análisis de Sentimientos</h3>
+            
+            <div class="sentiment-bar">
+                <span class="sentiment-label">Polaridad:</span>
+                <div class="sentiment-score">
+                    <div class="sentiment-fill {% if analysis.sentiment.polarity > 0 %}sentiment-positive{% elif analysis.sentiment.polarity < 0 %}sentiment-negative{% else %}sentiment-neutral{% endif %}" 
+                         style="width: {{ (analysis.sentiment.polarity + 1) * 50 }}%"></div>
+                </div>
+                <span>{{ "%.2f"|format(analysis.sentiment.polarity) }}</span>
+            </div>
+            
+            <div class="sentiment-bar">
+                <span class="sentiment-label">Subjetividad:</span>
+                <div class="sentiment-score">
+                    <div class="sentiment-fill sentiment-neutral" 
+                         style="width: {{ analysis.sentiment.subjectivity * 100 }}%"></div>
+                </div>
+                <span>{{ "%.2f"|format(analysis.sentiment.subjectivity) }}</span>
+            </div>
+            
+            <p><strong>Sentimiento General:</strong> {{ analysis.sentiment.sentiment_label|title }}</p>
+        </div>
+
+        <!-- Intensidad del Sueño -->
+        <div class="analysis-section">
+            <h3>⚡ Intensidad del Sueño</h3>
+            <div class="intensity-meter">
+                <div class="intensity-circle 
+                    {% if analysis.dream_intensity.score >= 80 %}intensity-very-high
+                    {% elif analysis.dream_intensity.score >= 60 %}intensity-high
+                    {% elif analysis.dream_intensity.score >= 40 %}intensity-moderate
+                    {% else %}intensity-low{% endif %}">
+                    {{ analysis.dream_intensity.score }}
+                </div>
+                <p><strong>Nivel:</strong> {{ analysis.dream_intensity.level|title }}</p>
+            </div>
+        </div>
+
+        <!-- Patrones Detectados -->
+        {% if analysis.patterns %}
+        <div class="analysis-section">
+            <h3>🔍 Patrones Detectados</h3>
+            <div class="pattern-grid">
+                {% for pattern_name, pattern_data in analysis.patterns.items() %}
+                <div class="pattern-item {% if pattern_data.found %}pattern-found{% endif %}">
+                    <strong>{{ pattern_name|title }}</strong><br>
+                    {% if pattern_data.found %}
+                        ✓ Detectado ({{ pattern_data.count }} veces)
+                    {% else %}
+                        ✗ No detectado
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Palabras Clave -->
+        {% if analysis.keywords %}
+        <div class="analysis-section">
+            <h3>🔑 Palabras Clave</h3>
+            <div class="keyword-cloud">
+                {% for word, count in analysis.keywords.items() %}
+                <span class="keyword">{{ word }} ({{ count }})</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Análisis Semántico -->
+        {% if analysis.semantic %}
+        <div class="analysis-section">
+            <h3>🧠 Análisis Semántico</h3>
+            {% for category, data in analysis.semantic.items() %}
+            {% if data.count > 0 %}
+            <div style="margin: 15px 0;">
+                <h4>{{ category|title }} ({{ data.count }} palabras, {{ "%.1f"|format(data.percentage) }}%)</h4>
+                <p>{{ data.words|join(', ') }}</p>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Reporte Generado -->
+        {% if analysis.report %}
+        <div class="analysis-section">
+            <h3>📋 Reporte del Sueño</h3>
+            <div style="background: white; padding: 20px; border-radius: 10px;">
+                <h4>Resumen:</h4>
+                <p>{{ analysis.report.resumen }}</p>
+                
+                {% if analysis.report.insights %}
+                <h4>Insights:</h4>
+                <ul>
+                    {% for insight in analysis.report.insights %}
+                    <li>{{ insight }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                
+                {% if analysis.report.recomendaciones %}
+                <h4>Recomendaciones:</h4>
+                <ul>
+                    {% for rec in analysis.report.recomendaciones %}
+                    <li>{{ rec }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="analysis-section">
+            <h3>❌ Error en el Análisis</h3>
+            <p>No se pudo realizar el análisis semántico de este sueño.</p>
+        </div>
+        {% endif %}
+
+        <div class="nav-links">
+            <a href="/">🌙 Registrar Nuevo Sueño</a>
+            <a href="/analysis">📊 Ver Análisis General</a>
+            <a href="/submissions">📝 Ver Todos los Sueños</a>
+        </div>
+    </div>
+</body>
+</html>

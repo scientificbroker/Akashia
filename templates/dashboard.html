@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Akashia - Dashboard Avanzado</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .chart-card {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        .chart-card h3 {
+            margin-top: 0;
+            color: #2d3748;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            color: #718096;
+            font-weight: 500;
+        }
+        .nav-links {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📈 Dashboard Avanzado</h1>
+        
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-number">{{ dreams|length }}</div>
+                <div class="stat-label">Total Sueños</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ dreams|selectattr('dream_type')|list|length }}</div>
+                <div class="stat-label">Con Tipo</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ dreams|selectattr('emotion')|list|length }}</div>
+                <div class="stat-label">Con Emoción</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ dreams|selectattr('region')|list|length }}</div>
+                <div class="stat-label">Con Región</div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Gráfico de tipos de sueños -->
+            <div class="chart-card">
+                <h3>Tipos de Sueños</h3>
+                <div id="dream-types-chart"></div>
+            </div>
+
+            <!-- Gráfico de emociones -->
+            <div class="chart-card">
+                <h3>Distribución de Emociones</h3>
+                <div id="emotions-chart"></div>
+            </div>
+
+            <!-- Gráfico de regiones -->
+            <div class="chart-card">
+                <h3>Sueños por Región</h3>
+                <div id="regions-chart"></div>
+            </div>
+
+            <!-- Gráfico temporal -->
+            <div class="chart-card">
+                <h3>Evolución Temporal</h3>
+                <div id="temporal-chart"></div>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="/">🌙 Registrar Sueño</a>
+            <a href="/analysis">📊 Análisis Semántico</a>
+            <a href="/submissions">📝 Ver Todos los Sueños</a>
+        </div>
+    </div>
+
+    <script>
+        // Datos para los gráficos
+        const dreams = {{ dreams|tojson }};
+        
+        // Procesar datos para gráficos
+        function processData() {
+            const dreamTypes = {};
+            const emotions = {};
+            const regions = {};
+            const temporalData = {};
+            
+            dreams.forEach(dream => {
+                // Tipos de sueños
+                const type = dream.dream_type || 'No especificado';
+                dreamTypes[type] = (dreamTypes[type] || 0) + 1;
+                
+                // Emociones
+                const emotion = dream.emotion || 'No especificado';
+                emotions[emotion] = (emotions[emotion] || 0) + 1;
+                
+                // Regiones
+                const region = dream.region || 'No especificado';
+                regions[region] = (regions[region] || 0) + 1;
+                
+                // Datos temporales
+                const date = dream.timestamp ? dream.timestamp.split('T')[0] : 'Sin fecha';
+                temporalData[date] = (temporalData[date] || 0) + 1;
+            });
+            
+            return { dreamTypes, emotions, regions, temporalData };
+        }
+        
+        const data = processData();
+        
+        // Gráfico de tipos de sueños
+        Plotly.newPlot('dream-types-chart', [{
+            values: Object.values(data.dreamTypes),
+            labels: Object.keys(data.dreamTypes),
+            type: 'pie',
+            marker: {
+                colors: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe']
+            }
+        }], {
+            margin: { t: 0, b: 0, l: 0, r: 0 }
+        });
+        
+        // Gráfico de emociones
+        Plotly.newPlot('emotions-chart', [{
+            x: Object.keys(data.emotions),
+            y: Object.values(data.emotions),
+            type: 'bar',
+            marker: {
+                color: '#667eea'
+            }
+        }], {
+            margin: { t: 0, b: 0, l: 0, r: 0 },
+            xaxis: { tickangle: 45 }
+        });
+        
+        // Gráfico de regiones
+        Plotly.newPlot('regions-chart', [{
+            x: Object.keys(data.regions),
+            y: Object.values(data.regions),
+            type: 'bar',
+            marker: {
+                color: '#764ba2'
+            }
+        }], {
+            margin: { t: 0, b: 0, l: 0, r: 0 },
+            xaxis: { tickangle: 45 }
+        });
+        
+        // Gráfico temporal
+        const sortedDates = Object.keys(data.temporalData).sort();
+        Plotly.newPlot('temporal-chart', [{
+            x: sortedDates,
+            y: sortedDates.map(date => data.temporalData[date]),
+            type: 'scatter',
+            mode: 'lines+markers',
+            line: {
+                color: '#667eea',
+                width: 3
+            },
+            marker: {
+                color: '#764ba2',
+                size: 8
+            }
+        }], {
+            margin: { t: 0, b: 0, l: 0, r: 0 },
+            xaxis: { tickangle: 45 }
+        });
+    </script>
+</body>
+</html>
