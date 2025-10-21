@@ -1,0 +1,9 @@
+# Configuración para Render
+# Este archivo le dice a Render cómo ejecutar tu aplicación
+
+# Comando para iniciar la aplicación
+web: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+
+# Variables de entorno por defecto
+ADMIN_PASSWORD=changeme123
+AKASHIA_CSV_PATH=/opt/render/project/src/submissions.csv
